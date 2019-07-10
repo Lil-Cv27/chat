@@ -1,33 +1,26 @@
-import socket, select
-import time_set as t
-
-#instant_time = time.strftime('%H:%M %d/%m/%Y', time.localtime())
-#time_date = (instant_time.split())
+import socket, select, time
 
 HEADER_LENGTH = 10
 host = socket.gethostbyname(socket.gethostname())
-port = 9090
+port = 8000
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server_socket.bind((host, port))
-server_socket.listen()
 
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+server_socket.bind((host, port))
+
+server_socket.listen()
 
 sockets_list = [server_socket]
 
 clients = {}
 
-
-
-
-print("SERVER STARTED " + t.instant_time)
-print(f'\nListening for connections on {host}:{port}...')
+print(f'Listening for connections on {host}:{port}...')
 
 def receive_message(client_socket):
     try:
         message_header = client_socket.recv(HEADER_LENGTH)
-
 
         if not len(message_header):
             return False
@@ -56,20 +49,20 @@ while True:
 
             clients[client_socket] = user
 
-            print(t.instant_time, 'Accept connection from: {}:{}, username: {}'.format(*client_address, user['data'].decode('utf-8')))
+            print('Accept connection from: {}:{}, username: {}'.format(*client_address, user['data'].decode('utf-8')))
 
         else:
             message = receive_message(notified_socket)
 
             if message is False:
-                print(t.instant_time, "Closed connection from: {}".format(clients[notified_socket]['data'].decode('utf-8')))
+                print("Closed connection from: {}".format(clients[notified_socket]['data'].decode('utf-8')))
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
 
             user = clients[notified_socket]
 
-            print(f"]{t.time_date[0]}[ Received message from {user['data'].decode('utf-8')}: {message['data'].decode('utf-8')}")
+            print(f"Received message from {user['data'].decode('utf-8')}: {message['data'].decode('utf-8')}")
 
             for client_socket in clients:
 
